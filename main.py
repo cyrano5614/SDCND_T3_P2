@@ -1,18 +1,25 @@
+"""
+Module to contruct tf graph for semantic segmentation
+"""
+
 import os.path
-import tensorflow as tf
-import helper
 import warnings
 from distutils.version import LooseVersion
+import tensorflow as tf
+import helper
 import project_tests as tests
 
 
 # Check TensorFlow Version
-assert LooseVersion(tf.__version__) >= LooseVersion('1.0'), 'Please use TensorFlow version 1.0 or newer.  You are using {}'.format(tf.__version__)
+assert LooseVersion(tf.__version__) >= LooseVersion('1.0'), \
+    'Please use TensorFlow version 1.0 or newer.  You are using {}'.format(
+        tf.__version__)
 print('TensorFlow Version: {}'.format(tf.__version__))
 
 # Check for a GPU
 if not tf.test.gpu_device_name():
-    warnings.warn('No GPU found. Please use a GPU to train your neural network.')
+    warnings.warn('No GPU found. Please use a GPU to train your neural \
+                  network.')
 else:
     print('Default GPU Device: {}'.format(tf.test.gpu_device_name()))
 
@@ -21,8 +28,10 @@ def load_vgg(sess, vgg_path):
     """
     Load Pretrained VGG Model into TensorFlow.
     :param sess: TensorFlow Session
-    :param vgg_path: Path to vgg folder, containing "variables/" and "saved_model.pb"
-    :return: Tuple of Tensors from VGG model (image_input, keep_prob, layer3_out, layer4_out, layer7_out)
+    :param vgg_path: Path to vgg folder, containing "variables/" and
+                     "saved_model.pb"
+    :return: Tuple of Tensors from VGG model (image_input, keep_prob,
+             layer3_out, layer4_out, layer7_out)
     """
     # TODO: Implement function
     #   Use tf.saved_model.loader.load to load the model and weights
@@ -32,7 +41,7 @@ def load_vgg(sess, vgg_path):
     vgg_layer3_out_tensor_name = 'layer3_out:0'
     vgg_layer4_out_tensor_name = 'layer4_out:0'
     vgg_layer7_out_tensor_name = 'layer7_out:0'
-    
+
     return None, None, None, None, None
 tests.test_load_vgg(load_vgg, tf)
 
