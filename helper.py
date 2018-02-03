@@ -11,6 +11,8 @@ from glob import glob
 from urllib.request import urlretrieve
 from tqdm import tqdm
 
+from imgaug import augmenters as iaa
+
 
 class DLProgress(tqdm):
     last_block = 0
@@ -78,6 +80,14 @@ def gen_batch_function(data_folder, image_shape):
                                           '*_road_*.png'))}
         background_color = np.array([255, 0, 0])
 
+        
+        flipper = iaa.Fliplr(1.0) # always horizontally flip each input image
+        vflipper = iaa.Flipud(1.0) # vertically flip each input image with 90% probability
+        # blurer = iaa.GaussianBlur(3.0) # apply gaussian blur
+        blurer = iaa.GaussianBlur(sigma=(0, 3.0)) # blur images with a sigma of 0 to 3.0
+        lighter = iaa.Add((-10, 10), per_channel=0.5), # change brightness of images (by -10 to 10 of original value)
+        translater = iaa.Affine(translate_percent={"x": (-0.2, 0.2), "y": (-0.2, 0.2)}) # translate by -20 to +20 percent (per axis)
+
         random.shuffle(image_paths)
         for batch_i in range(0, len(image_paths), batch_size):
             images = []
@@ -89,6 +99,21 @@ def gen_batch_function(data_folder, image_shape):
                                             image_shape)
                 gt_image = scipy.misc.imresize(scipy.misc.imread(gt_image_file),
                                                image_shape)
+
+                if np.random() > 0.7:
+                    image = flipper(image)
+                    gt_image = flipper(gt_image)
+                if np.random() > 0.7:
+                    image = vflipper(image)
+                    gt_image = vflipper(gt_image)
+                # if np.random() > 0.7:
+                #     image = translater(image)
+                #     gt_image = translater(gt_image)
+
+                if np.random() > 0.7:
+                    image = blurer(image)
+                if np.random() > 0.7:
+                    image = lighter(image)
 
                 gt_bg = np.all(gt_image == background_color, axis=2)
                 gt_bg = gt_bg.reshape(*gt_bg.shape, 1)

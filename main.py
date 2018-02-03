@@ -212,8 +212,8 @@ def run():
         # OPTIONAL: Augment Images for better results
         # Build NN using load_vgg, layers, and optimize function
 
-        epochs = 50
-        batch_size = 10
+        epochs = 25
+        batch_size = 25
 
         # TF placeholders
         correct_label = tf.placeholder(tf.int32,
