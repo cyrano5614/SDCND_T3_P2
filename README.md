@@ -1,6 +1,75 @@
 # Semantic Segmentation
-### Introduction
-In this project, you'll label the pixels of a road in images using a Fully Convolutional Network (FCN).
+### Project Introduction
+
+-------------------------------------------------------------------------------
+
+The goal of this project is to label the pixels of a road in images using a Fully Convolutional Network (FCN).
+
+-------------------------------------------------------------------------------
+
+### Project Implementation ###
+
+-------------------------------------------------------------------------------
+
+#### Data ####
+The data used in this project to train the model is from Road/Lane Detection Evaluation 2013
+Kitti dataset.  The data is divided in to training and testing and with training set, the correct img labe is also provided in color masked format.
+
+#### Training ####
+The data was augmented with horizontal flip, vertical flip, gaussian blur, and brightness to make the model more robust to changes in input.
+``
+
+        flipper = iaa.Fliplr(1.0) # always horizontally flip each input image
+        vflipper = iaa.Flipud(1.0) # vertically flip each input image with 90% probability
+        # blurer = iaa.GaussianBlur(3.0) # apply gaussian blur
+        blurer = iaa.GaussianBlur(sigma=(0, 3.0)) # blur images with a sigma of 0 to 3.0
+        lighter = iaa.Add((-10, 10), per_channel=0.5) # change brightness of images (by -10 to 10 of original value)
+        translater = iaa.Affine(translate_percent={"x": (-0.2, 0.2), "y": (-0.2, 0.2)}) # translate by -20 to +20 percent (per axis)
+
+        random.shuffle(image_paths)
+        for batch_i in range(0, len(image_paths), batch_size):
+            images = []
+            gt_images = []
+            for image_file in image_paths[batch_i:batch_i+batch_size]:
+                gt_image_file = label_paths[os.path.basename(image_file)]
+
+                image = scipy.misc.imresize(scipy.misc.imread(image_file),
+                                            image_shape)
+                gt_image = scipy.misc.imresize(scipy.misc.imread(gt_image_file),
+                                               image_shape)
+
+                if np.random.random() > 0.7:
+                    image = flipper.augment_image(image)
+                    gt_image = flipper.augment_image(gt_image)
+                if np.random.random() > 0.7:
+                    image = vflipper.augment_image(image)
+                    gt_image = vflipper.augment_image(gt_image)
+                # if np.random() > 0.7:
+                #     image = translater(image)
+                #     gt_image = translater(gt_image)
+
+                if np.random.random() > 0.7:
+                    image = blurer.augment_image(image)
+                if np.random.random() > 0.7:
+                    image = lighter.augment_image(image)
+
+The flipping was done to both original image and masking image, and the gaussian blur and the brightness was done to only the original image as altering the color of masking image would have had negative impact on the model.
+
+#### Result  ####
+[image1]: ./runs/1517670243.5980434(most_recent)/um_000058.png
+![alt text][image1]
+
+[image2]: ./runs/1517670243.5980434(most_recent)/um_000081.png
+![alt text][image2]
+
+[image3]: ./runs/1517670243.5980434(most_recent)/um_000086.png
+![alt text][image3]
+
+[image4]: ./runs/1517670243.5980434(most_recent)/umm_000016.png
+![alt text][image4]
+
+[image5]: ./runs/1517670243.5980434(most_recent)/um_000016.png
+![alt text][image5]
 
 ### Setup
 ##### Frameworks and Packages
